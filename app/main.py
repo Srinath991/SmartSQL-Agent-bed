@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.agent import run_sql_agent_stream
 import json
 from fastapi.responses import StreamingResponse
+from app.auth import get_current_user
 
 app = FastAPI(title="SQL Agent API", version="1.0")
 
@@ -20,6 +21,7 @@ app.add_middleware(
 async def ask_sql_agent_stream(
     query: str = Query(...),
     delay_ms: int = Query(30, ge=0, le=1000, description="Delay per token in milliseconds"),
+    current_user: dict = Depends(get_current_user),
 ):
     """
     Stream SQL agent responses incrementally.
