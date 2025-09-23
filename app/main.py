@@ -1,0 +1,35 @@
+from fastapi import FastAPI, Depends, Header, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from app.agent import run_sql_agent_stream
+import json
+from fastapi.responses import StreamingResponse
+
+app = FastAPI(title="SQL Agent API", version="1.0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # restrict in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+
+@app.get("/ask/stream")
+async def ask_sql_agent_stream(
+    query: str = Query(...),
+    delay_ms: int = Query(30, ge=0, le=1000, description="Delay per token in milliseconds"),
+):
+    """
+    Stream SQL agent responses incrementally.
+    Returns a streaming text/event-stream format.
+    """
+
+    async def event_generator():
+        delay_seconds = (delay_ms or 0) / 1000.0
+        async for chunk in run_sql_agent_stream(query, typing_delay=delay_seconds):
+            yield f"data: {json.dumps(chunk)}\n\n"
+
+    
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

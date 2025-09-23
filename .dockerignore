@@ -1,0 +1,17 @@
+# Ignore Python virtual environments
+.venv/
+
+# Ignore common Python cache and build artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Ignore OS and editor files
+.DS_Store
+*.swp
+*.swo
+.env
