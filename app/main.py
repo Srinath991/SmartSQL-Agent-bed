@@ -16,7 +16,6 @@ app.add_middleware(
 )
 @app.get("/health")
 async def check_health():
-    sleep(10)
     return {"status": "I am alive"}
     
 
